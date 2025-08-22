@@ -1,5 +1,7 @@
 import 'package:bmi_calculator/core/appColors.dart';
+import 'package:bmi_calculator/pages/resultScreen.dart';
 import 'package:bmi_calculator/widgets/gender_card.dart';
+import 'package:bmi_calculator/widgets/weight_and_age.dart';
 import 'package:flutter/material.dart';
 
 class Bmicalculator extends StatefulWidget {
@@ -10,6 +12,10 @@ class Bmicalculator extends StatefulWidget {
 }
 
 class _BmicalculatorState extends State<Bmicalculator> {
+  int weight = 150;
+  int age = 26;
+  int slideHeight = 190 ; 
+  bool isMale = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +45,7 @@ class _BmicalculatorState extends State<Bmicalculator> {
         
         
          //weight and age
-        ageAndWeight(),        
-        
-        
+        ageAndWeight(),
         
         
         
@@ -57,7 +61,13 @@ class _BmicalculatorState extends State<Bmicalculator> {
               backgroundColor: Appcolors().sideColor
             ),
             
-            onPressed: (){}, child: Text('Calculate',
+            onPressed: (){
+              double result = weight / (slideHeight*slideHeight*0.0001);
+              
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>Resultscreen(result:result)));
+            }, 
+            
+            child: Text('Calculate',
             style: TextStyle(
               fontSize: 15,
               color: Appcolors().secColor
@@ -88,7 +98,7 @@ class _BmicalculatorState extends State<Bmicalculator> {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text('190',style: TextStyle(
+                Text(slideHeight.toString(),style: TextStyle(
                   color: Appcolors().whiteColor,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -104,7 +114,9 @@ class _BmicalculatorState extends State<Bmicalculator> {
 
             Row(),
 
-            Slider(value: 190, onChanged: (V){},min: 80,max: 220,activeColor: Appcolors().sideColor,inactiveColor: Appcolors().primaryColor,)
+            Slider(value: slideHeight.toDouble(), onChanged: (value){setState(() {
+              slideHeight=value.toInt();
+            });},min: 80,max: 220,activeColor: Appcolors().sideColor,inactiveColor: Appcolors().primaryColor,)
           ],
         ),
        )
@@ -116,8 +128,20 @@ class _BmicalculatorState extends State<Bmicalculator> {
       Row(
         spacing: 10,
         children: [
-          genderCard(title: 'Male', icon: Icons.male,color: Appcolors().secColor,),
-          genderCard(title: 'Female', icon: Icons.female,color: Appcolors().sideColor,),
+          genderCard(title: 'Male', icon: Icons.male,
+          color: isMale? Appcolors().secColor : Appcolors().sideColor,
+          onTap: (){
+            setState(() {
+              isMale=true;
+            });
+          },),
+          genderCard(title: 'Female', icon: Icons.female,
+          color: !isMale? Appcolors().secColor : Appcolors().sideColor,
+          onTap: (){
+      setState(() {
+        isMale = false;
+      });
+          },),
 
         ],
       ));
@@ -125,13 +149,24 @@ class _BmicalculatorState extends State<Bmicalculator> {
 
  Expanded ageAndWeight() {
     return Expanded(child: 
-      Row(
-        spacing: 10,
-        children: [
-          genderCard(title: 'Male', icon: Icons.male,color: Appcolors().secColor,),
-          genderCard(title: 'Female', icon: Icons.female,color: Appcolors().sideColor,),
-
-        ],
-      ));
+      Row(spacing: 10,
+  children: [
+    weightAndAge(title:'Age',numTitle:age,onAdd:() {setState(() {
+      age++;
+    });},onRemove: () {
+      if (age>19){setState(() {
+        age--;
+      });}
+    },),
+    weightAndAge(title:'weight',numTitle:weight, onAdd:() {setState(() {
+      weight++;
+    });},onRemove: () {
+      if(weight>45){setState(() {
+        weight--;
+      });}
+    },)
+  ],
+)    ,
+);
   }
 }
